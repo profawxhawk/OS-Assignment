@@ -25,7 +25,8 @@ struct list sleeptime;
 /* Number of loops per timer tick.
    Initialized by timer_calibrate(). */
 static unsigned loops_per_tick;
-
+void list_insert_ordered_define (struct list *list, struct list_elem* elemy);
+void sleep_until_calc(int64_t ticks);
 static intr_handler_func timer_interrupt;
 static bool too_many_loops (unsigned loops);
 static void busy_wait (int64_t loops);
@@ -90,7 +91,6 @@ void
 list_insert_ordered_define (struct list *list, struct list_elem* elemy)
  {
    struct list_elem *e;
- 
    ASSERT (list != NULL);
    ASSERT (elemy != NULL);
    struct thread *thread_elemy = list_entry(elemy, struct thread, elem);
@@ -196,11 +196,28 @@ timer_print_stats (void)
 }
 
 /* Timer interrupt handler. */
+static void wake_up(struct list *list){
+   struct list_elem *e;
+   struct thread *e_thread;
+  while(!list_empty(list))
+  {
+    e = list_front(list);
+    e_thread = list_entry (e, struct thread, elem);
+      if(e_thread->wakeuptime <= ticks ){
+        list_remove (e);
+        thread_unblock(e_thread);
+      }
+      else{
+      break;
+    }
+  }
+}
 static void
 timer_interrupt (struct intr_frame *args UNUSED)
 {
   ticks++;
   thread_tick ();
+   wake_up(&sleeptime);
 }
 
 /* Returns true if LOOPS iterations waits for more than one timer
