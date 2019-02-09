@@ -204,7 +204,7 @@ static void wake_up(struct list *list){
     e = list_front(list);
     e_thread = list_entry (e, struct thread, elem);
       if(e_thread->wakeuptime <= ticks ){
-        //e_thread->wakeuptime=0;
+        e_thread->wakeuptime=0;
         list_remove (e);
         thread_unblock(e_thread);
       }
@@ -217,8 +217,9 @@ static void
 timer_interrupt (struct intr_frame *args UNUSED)
 {
   ticks++;
+  wake_up(&sleeptime);
   thread_tick ();
-   wake_up(&sleeptime);
+   
 }
 
 /* Returns true if LOOPS iterations waits for more than one timer
