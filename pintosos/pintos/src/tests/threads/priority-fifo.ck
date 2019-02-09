@@ -47,7 +47,7 @@ my (@sorted_numbering) = sort { $a <=> $b } @numbering;
 for my $i (0...$#sorted_numbering) {
     if ($sorted_numbering[$i] != $i) {
 	fail "First iteration does not list all threads "
-	  . "0...$#sorted_numbering\n";
+	  . "0...$sorted_numbering[$i]\n";
     }
 }
 

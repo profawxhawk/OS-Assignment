@@ -204,6 +204,7 @@ static void wake_up(struct list *list){
     e = list_front(list);
     e_thread = list_entry (e, struct thread, elem);
       if(e_thread->wakeuptime <= ticks ){
+        //e_thread->wakeuptime=0;
         list_remove (e);
         thread_unblock(e_thread);
       }
